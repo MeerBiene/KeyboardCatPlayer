@@ -7,12 +7,8 @@ module.exports = async (client, message) => {
 
 
 if (message.author.bot) return  
+  
 
-    // event manager -> checks in plugins for events and executes them if needed
-    client.eventmanager('message', message)
-  
-  
-  
     const msgdel = client.config.msgdelete
     //const settings = client.dbgetconfig(message)
     const Prefix = "!"
