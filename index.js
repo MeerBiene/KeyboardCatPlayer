@@ -15,12 +15,10 @@ client.logger = require("./modules/Logger");
 //require("./modules/dbhandler.js")(client);
 require("./modules/functions.js")(client);
 require("./modules/embeds.js")(client);
-require("./modules/plugman.js")(client);
 
 
 client.commands = new Enmap();
 client.aliases = new Enmap();
-client.plugins = new Enmap();
 
 
 const init = async () => {
@@ -38,23 +36,7 @@ const init = async () => {
     }
 
 
-    async function allplugins() {
-
-
-      var path = "./plugins"
-      await readdir(path, function (err, items) {
-        let amount = items.length  
-        client.logger.log(`${chalk.bgBlue("[PLUGMAN]")} Loading ${chalk.green(amount)} plugins:`);
-        for (var i = 0; i < amount; i++) {
-              if (client.plugins.get(items[i])) return
-              let name = items[i]
-              
-              client.pluginloader(items[i])
-        }
-        client.logger.log(`${chalk.bgBlue("[PLUGMAN]")} Finished loading ${chalk.green(amount)} plugins!`);
-      })
-
-    }
+   
   
     
   
