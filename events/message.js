@@ -14,6 +14,9 @@ if (message.author.bot) return
     const Prefix = "!"
 
 
+  
+ // yo tbh im just putitng something here cause i want a commit today and i dont want to break
+ // my streak.. sorry.
 
 
 
