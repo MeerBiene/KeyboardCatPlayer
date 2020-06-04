@@ -22,42 +22,24 @@ module.exports = (client) => {
     
     
     
-    client.pluginloader = (pluginname) => {
-        try {
-    
-            const props = require(`../plugins/${pluginname}/index`)
-            if (props.init) {
-                props.init(client);
-            }
-    
-    
-            // set the plugin to the plugin enmap
-            // -> TODO: plugin overview/ctl cmd
-            client.plugins.set(pluginname, props.plugin)
-    
-            // now lets register the plugins commands.
-            // TODO: make sure there's no double commands, aliases
-    
-            let plugincommands = props.plugin.cmds
-            //console.log(plugincommands)
-    
-            for (let key in plugincommands) {
-                if (plugincommands.hasOwnProperty(key)) {
-                    value = plugincommands[key];
-                    //console.log(key, value);
-                    client.commands.set(key, value)
-                    //console.log(client.commands)
-                }
-            }
-    
-    
-    
-    
-    
-    
-        } catch (e) {
-            return `Unable to load PLUGIN NAME`
-        }
+    client.promptMessage = async (message, author, time, validReactions) => {
+      // We put in the time as seconds, with this it's being transfered to MS
+      time *= 1000;
+  
+      // For every emoji in the function parameters, react in the good order.
+      for (const reaction of validReactions) await message.react(reaction);
+  
+      // Only allow reactions from the author, 
+      // and the emoji must be in the array we provided.
+      const filter = (reaction, user) => validReactions.includes(reaction.emoji.name) && user.id === author.id;
+  
+      // And ofcourse, await the reactions
+      return message
+        .awaitReactions(filter, {
+          max: 1,
+          time: time
+        })
+        .then(collected => collected.first() && collected.first().emoji.name);
     }
     
     
