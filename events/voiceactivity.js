@@ -18,7 +18,7 @@ module.exports = async (client, voiceuserobject) => {
         server.queue.shift();
 
         server.dispatcher.on("end", function () {
-           server.queue.pus 
+           server.queue.push('https://www.youtube.com/watch?v=NTui4VtozkM')
             if (server.queue[0]) {
                 play(connection, message);
             } else {
@@ -33,7 +33,7 @@ module.exports = async (client, voiceuserobject) => {
 
 
     let chan = await handle.dbget(`${voiceuserobject.guild}`)
-    let cache = {};
+    let cache = [];
 
     console.log(chan)
     if (!chan) return
@@ -43,6 +43,7 @@ module.exports = async (client, voiceuserobject) => {
 
     if (!message.guild.voiceConnection) member.voiceChannel.join().then(function (connection) {
         play(connection, Guild);
-        cache.push([`${member.voiceChannel.id}`, `${voiceuserobject.user}`])
+        if (cache.includes(member.voiceChannel.id)) return
+        cache.push(member.voiceChannel.id)
     })
 }
