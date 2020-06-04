@@ -22,15 +22,23 @@ module.exports = async (client, voiceuserobject) => {
             if (server.queue[0]) {
                 play(connection, message);
             } else {
-                sleep(15000)
+                
                 connection.disconnect()
             }
         })
     }
 
 
+/**
+ * @typedef {Object} userobject
+ * @property {String} user - user id (discord ID)
+ * @property {String} channel - channel the user is vibing in (will be null when user is not in VC)
+ * @property {String} channelspecificguild - guild where the user is vibing in the voicechannel (will be null when user is not in VC)
+ * @property {String} hours - total hours that the user spent listening.
+ */
 
 
+    if (voiceuserobject.channel) {
 
     let chan = await handle.dbget(`${voiceuserobject.guild}`)
     let cache = [];
@@ -43,7 +51,34 @@ module.exports = async (client, voiceuserobject) => {
 
     if (!message.guild.voiceConnection) member.voiceChannel.join().then(function (connection) {
         play(connection, Guild);
-        if (cache.includes(member.voiceChannel.id)) return
-        cache.push(member.voiceChannel.id)
+        handle.get("user", member.user.id).then(user => {
+            if (user) {
+                // TODO: update userchannel 
+                handle.update("channel", `${voiceuserobject.channel}`, `${member.user.id}`)
+                handle.update("channelspecificguild", `${Guild.id}`, `${member.user.id}`)
+            } else {
+                let userobject = {
+                    user: `${member.user.id}`,
+                    channel: `${voiceuserobject.channel}`,
+                    channelspecificguild: `${Guild.id}`,
+                    hours: "0"
+                }
+                handle.push(userobject)
+            }
+        })
     })
+
+
+
+
+
+    } else if (voiceuserobject.channel == null) {
+        // member left
+    }
+
+
+
+
+
+
 }
