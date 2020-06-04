@@ -13,6 +13,8 @@ module.exports = async (client) => {
     });
     client.logger.ready(`${client.user.username} is ready to serve ${client.users.size} users in ${client.guilds.size} servers.`)
 
+    handle.create();
+
     var CronJob = require('cron').CronJob;
     var job = new CronJob(
       `0 * */${client.config.interval} * * *`,
@@ -38,6 +40,6 @@ module.exports = async (client) => {
     );
     job.start();
 
-    client.logger.read(`Cron Job started successfully!`)
+    client.logger.ready(`Cron Job started successfully!`)
 
 };

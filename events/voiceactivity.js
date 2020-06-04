@@ -1,27 +1,38 @@
 const handle = require("../modules/handle");
+const ytdl = require('ytdl-core')
 
 module.exports = async (client, voiceuserobject) => {
+
+  const queue = [
+    'https://www.youtube.com/watch?v=Ngqf466AVb8',
+    'https://www.youtube.com/watch?v=Ngqf466AVb8'
+  ]
+  
   // when channel is "null" the user left the voicechannel
   // TODO: track users and playtime yo
-  console.log("voiceactivity");
+  console.log(voiceuserobject);
 
+  let Guild = client.guilds.get(voiceuserobject.guild);
+  let member = Guild.fetchMember(voiceuserobject.user)
   // queue cache
-  var servers = {};
+  
 
   function play(connection, Guild) {
-    var server = servers[Guild.id];
+    
 
-    server.dispatcher = connection.playStream(
-      ytdl(server.queue[0], {
+    
+    dispatcher = connection.playStream(
+      ytdl(queue[0], {
         filter: "audioonly",
+        filter: format => format.container === 'mp4'
       })
     );
 
-    server.queue.shift();
+    queue.shift();
 
-    server.dispatcher.on("end", function () {
-      server.queue.push("https://www.youtube.com/watch?v=NTui4VtozkM");
-      if (server.queue[0]) {
+    dispatcher.on("end", function () {
+      queue.push("https://www.youtube.com/watch?v=Ngqf466AVb8");
+      if (queue[0]) {
         play(connection, Guild);
       } else {
         connection.disconnect();
@@ -39,42 +50,46 @@ module.exports = async (client, voiceuserobject) => {
 
   if (voiceuserobject.channel) {
     let chan = await handle.dbget(`${voiceuserobject.guild}`);
-    let cache = [];
+    
 
-    console.log(chan);
+    //console.log(chan);
     if (!chan) return;
-    const member = client.users.get(voiceuserobject.user);
-    const Guild = client.guild.get(voiceuserobject.guild);
+   
+    const Guild = client.guilds.get(voiceuserobject.guild);
+    
+    
+   
+    
 
-    if (!servers[Guild.id])
-      servers[Guild.id] = {
-        queue: [],
-      };
+    //console.log(member)
 
-    var server = servers[Guild.id];
+    if (!Guild.voiceConnection)
 
-    if (!message.guild.voiceConnection)
-      member.voiceChannel.join().then(function (connection) {
-        server.queue.push("https://www.youtube.com/watch?v=NTui4VtozkM");
+    chann = Guild.channels.get(chan)
+
+    
+      chann.join().then(function (connection) {
+       
+        queue.push("https://www.youtube.com/watch?v=Ngqf466AVb8");
         play(connection, Guild);
-        handle.get("user", member.user.id).then((user) => {
+        handle.get("user", voiceuserobject.user).then((user) => {
           if (user) {
             // TODO: update userchannel
             handle.update(
               "channel",
               `${voiceuserobject.channel}`,
-              `${member.user.id}`
+              `${voiceuserobject.user}`
             );
             handle.update(
               "channelspecificguild",
               `${Guild.id}`,
-              `${member.user.id}`
+              `${voiceuserobject.user}`
             );
           } else {
             let userobject = {
-              user: `${member.user.id}`,
+              user: `${voiceuserobject.user}`,
               channel: `${voiceuserobject.channel}`,
-              channelspecificguild: `${Guild.id}`,
+              channelspecificguild: `${voiceuserobject.guild}`,
               hours: "0",
             };
             handle.push(userobject);
@@ -83,16 +98,17 @@ module.exports = async (client, voiceuserobject) => {
       });
   } else if (!voiceuserobject.channel) {
     // member left
-    let checkchan = handle.get("user", voiceuserobject.user.id);
+    let checkchan = await handle.get("user", voiceuserobject.user);
+    console.log(checkchan)
 
     let emtpycheck = handle.get("channel", checkchan[0].channel);
 
-    handle.update("channel", "", voiceuserobject.user.id);
-    handle.update("channelspecificguild", "", voiceuserobject.user.id);
+    handle.update("channel", "", voiceuserobject.user);
+    handle.update("channelspecificguild", "", voiceuserobject.user);
 
     if (emtpycheck[0]) return;
 
-    let Guild = client.guilds.get(voiceuserobject.guild);
+    
     let chan = Guild.channels.get(checkchan.channel);
 
     chan.leave();

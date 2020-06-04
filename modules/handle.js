@@ -1,15 +1,15 @@
 const SQLite = require("better-sqlite3");
 const keyv = require('keyv')
-const db = new keyv('sqlite://../data/channels.sqlite')
-const cache = new keyv('sqlite://../data/cache.sqlite')
-const data = new SQLite('./data/userdata.sqlite')
+const db = new keyv('sqlite://modules/data/channels.sqlite')
+const cache = new keyv('sqlite://modules/data/cache.sqlite')
+const data = new SQLite('modules/data/data.sqlite')
 
 async function create () {
-    const table = sql.prepare(`SELECT count(*) FROM sqlite_master WHERE type='table' AND name = 'data';`).get();
+    const table = data.prepare(`SELECT count(*) FROM sqlite_master WHERE type='table' AND name='data';`).get();
     if (!table['count(*)']) {
-        sql.prepare("CREATE TABLE data (user TEXT, channel TEXT, channelspecificguild TEXT, hours TEXT);").run()
-        sql.pragma("synchronous = 1");
-        sql.pragma("journal_mode = wal");
+        data.prepare("CREATE TABLE data (user TEXT, channel TEXT, channelspecificguild TEXT, hours TEXT);").run()
+        data.pragma("synchronous = 1");
+        data.pragma("journal_mode = wal");
     }
 }
 
@@ -28,15 +28,15 @@ async function create () {
  */
 
 async function push(userobject) {
-    sql.prepare(`INSERT INTO data (user, channel, channelspecificguild, hours) VALUES (@user, @channel, @channelspecificguild, @hours)`).run(userobject)
+    data.prepare(`INSERT INTO data (user, channel, channelspecificguild, hours) VALUES (@user, @channel, @channelspecificguild, @hours)`).run(userobject)
 }
 
 async function get (field, key) {
-    return sql.prepare(`SELECT * FROM 'data' WHERE ${field}='${key}';`).all()
+    return data.prepare(`SELECT * FROM 'data' WHERE ${field}='${key}';`).all()
 }
 
 async function update(key, value, ID) {
-    sql.prepare(`UPDATE 'data' SET ${key}='${value}' WHERE user='${ID}'`).run()
+    data.prepare(`UPDATE 'data' SET ${key}='${value}' WHERE user='${ID}'`).run()
 }
 
 async function dbpush (key, value) {
